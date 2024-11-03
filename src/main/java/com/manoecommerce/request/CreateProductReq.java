@@ -22,7 +22,9 @@ public class CreateProductReq {
 	
 	private int discountedPrice;
 	
-	private int quality;
+	private int discountedPercent;
+	
+	private int quantity;
 	
 	private String brand;
 	
