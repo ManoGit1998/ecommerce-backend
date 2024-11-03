@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.base.Strings;
 import com.manoecommerce.entity.Category;
@@ -57,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
 		Category thirdLevel = categoryRepo.findByNameAndParent(req.getThirdLevelCategory(), secondLevel.getName());
 		if (thirdLevel == null) {
 			Category thirdLevelCategory = new Category();
-			thirdLevelCategory.setName(req.getSecondLevelCategory());
+			thirdLevelCategory.setName(req.getThirdLevelCategory());
 			thirdLevelCategory.setLevel(3);
 			thirdLevelCategory.setParentCategory(secondLevel);
 			thirdLevel = categoryRepo.save(thirdLevelCategory);
@@ -123,12 +124,13 @@ public class ProductServiceImpl implements ProductService {
 
 		Pageable pageble = PageRequest.of(pageNumber, pageSize);
 		List<Product> products = productRepo.filteredProduct(category, minPrice, maxPrice, minDiscount, sort);
-		if (!color.isEmpty()) {
+		
+		if (!CollectionUtils.isEmpty(color) && color != null) {
 			products = products.stream().filter(p -> color.stream().anyMatch(c -> c.equalsIgnoreCase(p.getColor())))
 					.collect(Collectors.toList());
 		}
 
-		if (Strings.isNullOrEmpty(stock)) {
+		if (!Strings.isNullOrEmpty(stock)) {
 			if (stock.equals("in-stock")) {
 				products = products.stream().filter(p -> p.getQuantity() > 0).collect(Collectors.toList());
 			} else if (stock.equals("out-of-stock")) {
@@ -139,11 +141,17 @@ public class ProductServiceImpl implements ProductService {
 		int startIndex = (int) pageble.getOffset();
 		int endIndex = Math.min(startIndex + pageble.getPageSize(), products.size());
 
-		List<Product> pageContent = products.subList(endIndex, endIndex);
-
+		List<Product> pageContent = products.subList(startIndex, endIndex);
+		
 		Page<Product> filteredProducts = new PageImpl<>(pageContent, pageble, products.size());
 
 		return filteredProducts;
+	}
+
+	@Override
+	public List<Product> findAllProduct() {
+		
+		return productRepo.findAll();
 	}
 
 }
