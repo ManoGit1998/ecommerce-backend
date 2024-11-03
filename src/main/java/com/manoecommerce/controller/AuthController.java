@@ -1,7 +1,8 @@
 package com.manoecommerce.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manoecommerce.com.config.JwtProvider;
+import com.manoecommerce.entity.Cart;
 import com.manoecommerce.entity.User;
 import com.manoecommerce.exception.UserException;
 import com.manoecommerce.repository.UserRepository;
 import com.manoecommerce.request.LoginRequest;
 import com.manoecommerce.response.AuthResponse;
+import com.manoecommerce.service.CartService;
 import com.manoecommerce.serviceImpl.CustomUserServiceImplemetation;
 
 @RestController
@@ -33,13 +36,16 @@ public class AuthController {
 	private PasswordEncoder passEncoder;
 
 	private CustomUserServiceImplemetation customUserServiceImplemetation;
+	
+	private CartService cartService;
 
 	public AuthController(UserRepository userrepoository, CustomUserServiceImplemetation customUserServiceImplemetation,
-			PasswordEncoder passEncoder ,JwtProvider jwtProvider) {
+			PasswordEncoder passEncoder ,JwtProvider jwtProvider,CartService cartService) {
 		this.userrepoository = userrepoository;
 		this.customUserServiceImplemetation = customUserServiceImplemetation;
 		this.passEncoder = passEncoder;
 		this.jwtProvider=jwtProvider;
+		this.cartService=cartService;
 	}
 
 	@PostMapping("/signup")
@@ -60,8 +66,10 @@ public class AuthController {
 		createdUser.setPassword(passEncoder.encode(password));
 		createdUser.setFirstName(firstName);
 		createdUser.setLastName(lastName);
+		createdUser.setCreatedAt(LocalDateTime.now());
 
 		User savedUser = userrepoository.save(createdUser);
+		Cart cart=cartService.createCard(savedUser);
 
 		Authentication authentication = new UsernamePasswordAuthenticationToken(savedUser.getEmail(),
 				savedUser.getPassword());

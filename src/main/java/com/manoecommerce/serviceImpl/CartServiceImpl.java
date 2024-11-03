@@ -2,6 +2,7 @@ package com.manoecommerce.serviceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.manoecommerce.entity.Cart;
 import com.manoecommerce.entity.CartItem;
@@ -63,16 +64,18 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public Cart findUserCart(Long userId) {
 		Cart cart = cartrepo.findByUserId(userId);
+		
+		
 		int totalPrice = 0;
 		int totalDiscountePrice = 0;
 		int totalItem = 0;
 
-		for (CartItem item : cart.getCartItems()) {
-			totalPrice = totalPrice + item.getPrice();
-			totalDiscountePrice = totalDiscountePrice + item.getDiscountedPrice();
-			totalItem = totalItem + item.getQuantity();
+			for (CartItem item : cart.getCartItems()) {
+				totalPrice = totalPrice + item.getPrice();
+				totalDiscountePrice = totalDiscountePrice + item.getDiscountedPrice();
+				totalItem = totalItem + item.getQuantity();
 
-		}
+			}
 		cart.setTotalDiscountedPrice(totalDiscountePrice);
 		cart.setTotalItem(totalItem);
 		cart.setTotalPrice(totalPrice);

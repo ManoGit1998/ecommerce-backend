@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
+public class Orders {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -52,9 +52,13 @@ public class Order {
 	private Integer totalDiscountedPrice;
 
 	private Integer discount;
+	
+	private int totalItem;
 
 	private String orderStatus;
 
+	private LocalDateTime orderDate;
+	
 	private LocalDateTime createdAt;
 
 }
