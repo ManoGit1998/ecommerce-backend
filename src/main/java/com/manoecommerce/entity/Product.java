@@ -36,10 +36,16 @@ public class Product {
 	private int price;
 
 	private int discountedPrice;
+	
+	private int discountedPercent;
 
 	private String brand;
 
 	private String color;
+	
+	private String description;
+	
+	private int quantity;
 
 	@Embedded
 	@ElementCollection
